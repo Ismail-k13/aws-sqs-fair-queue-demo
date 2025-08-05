@@ -14,8 +14,6 @@ A hands-on demo showing how to use the new **Amazon SQS Fair Queues** feature to
 
 **Fair Queues** are a new SQS queue type introduced in 2025 to **detect and slow down noisy tenants**, giving fair processing time to quieter senders.
 
-> [🔗 Official AWS Blog Post](https://aws.amazon.com/blogs/aws/amazon-sqs-fair-queues-now-available/)
-
 ---
 
 ## 📁 Project Structure
@@ -87,7 +85,7 @@ Ensure your IAM user has this policy attached:
 ### 3. Clone the Repo and Run Scripts
 
 ```bash
-git clone https://github.com/Your_Github_Name/aws-sqs-fair-queue-demo.git
+git clone https://github.com/Ismail-k13/aws-sqs-fair-queue-demo.git
 cd aws-sqs-fair-queue-demo
 pip install -r requirements.txt
 ```
@@ -151,7 +149,7 @@ In the AWS SQS Console:
 
 ##  Acknowledgements
 
-* [AWS Official Blog on Fair Queues](https://aws.amazon.com/blogs/aws/amazon-sqs-fair-queues-now-available/)
+* AWS Official Blog on Fair Queues
 * AWS Boto3 SDK
 * AWS Free Tier
 
