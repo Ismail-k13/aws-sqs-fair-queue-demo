@@ -1,113 +1,147 @@
-project: **AWS SQS Fair Queue Demo**. This version provides complete setup instructions for developers using AWS Free Tier.
+# AWS SQS Fair Queue Demo - Complete Documentation
 
----
-# AWS SQS Fair Queue Demo
+## Overview
 
-A hands-on demo showing how to use the new **Amazon SQS Fair Queues** feature to handle multi-tenant message fairness without code-level throttling or priority logic.
-
->  Built with Python, Boto3, and AWS Free Tier  
->  Simulates noisy vs. quiet tenants and shows how SQS fairly processes their messages.
+This documentation provides a complete walkthrough of building and running a demo for Amazon SQS Fair Queues using Python, AWS Free Tier, and the Boto3 SDK. The goal of this project is to demonstrate how Fair Queues automatically ensure message delivery fairness among tenants without requiring application-level throttling or prioritization logic.
 
 ---
 
-## What Are SQS Fair Queues?
+## Table of Contents
 
-**Fair Queues** are a new SQS queue type introduced in 2025 to **detect and slow down noisy tenants**, giving fair processing time to quieter senders.
+1. Introduction to SQS Fair Queues
+2. Prerequisites
+3. AWS Setup
+
+   * IAM User Creation
+   * Access Key and Secret Key
+4. Creating the SQS Fair Queue
+5. Local Environment Setup
+
+   * Cloning the Repository
+   * Installing Python Requirements
+6. Understanding the Folder Structure
+7. Code Explanation
+
+   * Producer Script (`producer.py`)
+   * Consumer Script (`consumer.py`)
+8. Why Two Terminals Are Used
+9. Running the Demo
+10. Observing Results in AWS Console
+11. Cleanup Steps and Security Best Practices
+12. Conclusion
 
 ---
 
-## 📁 Project Structure
+## 1. Introduction to SQS Fair Queues
 
-```text
-aws-sqs-fair-queue-demo/
-│
-├── scripts/
-│   ├── producer.py      # Sends messages from multiple tenants
-│   └── consumer.py      # Receives and prints messages
-│
-├── assets/
-│   └── screenshots/     # Screenshots of queue setup, monitoring, etc.
-│
-├── .gitignore
-├── README.md
-└── requirements.txt
-````
+Amazon SQS Fair Queues provide a new queue type that balances message consumption from different tenants or sources. Instead of relying on application logic to prevent noisy tenants from dominating the queue, Fair Queues apply adaptive rate-limiting and deliver messages fairly.
 
 ---
 
-##  Prerequisites
+## 2. Prerequisites
 
-* ✅ AWS Free Tier account
-* ✅ IAM user with SQS permissions
-* ✅ Python 3.8+
-* ✅ AWS CLI configured
-* ✅ Boto3 installed
+Before starting the project, ensure you have the following:
+
+* An AWS Free Tier account
+* Python 3.8 or later
+* AWS CLI installed and configured
+* Git installed on your system
+* A GitHub repository (e.g., [https://github.com/Ismail-k13/aws-sqs-fair-queue-demo.git](https://github.com/Ismail-k13/aws-sqs-fair-queue-demo.git))
+
+---
+
+## 3. AWS Setup
+
+### IAM User Creation
+
+You need to create an IAM user to interact with AWS services securely.
+
+1. Go to the [AWS IAM Console](https://console.aws.amazon.com/iam/)
+2. Click on "Users" > "Add user"
+3. Enter a username (e.g., `sqs-fair-demo-user`)
+4. Enable "Programmatic access"
+5. Attach policies:
+
+   * `AmazonSQSFullAccess`
+6. Create the user and save the Access Key ID and Secret Access Key securely
+
+### Why Access and Secret Keys Are Needed
+
+These keys authenticate your local Python scripts with AWS to send/receive messages via the SQS service using the Boto3 SDK.
+
+---
+
+## 4. Creating the SQS Fair Queue
+
+1. Go to the [Amazon SQS Console](https://console.aws.amazon.com/sqs/)
+2. Click "Create Queue"
+3. Select "Fair Queue"
+4. Name the queue: `FairQueueDemo`
+5. Region: `eu-north-1` (Stockholm) to stay within Free Tier
+6. Click "Create Queue"
+
+Note: Do it in your region.
+---
+
+## 5. Local Environment Setup
+
+### Clone the Repository
+
+```bash
+git clone https://github.com/Ismail-k13/aws-sqs-fair-queue-demo.git
+cd aws-sqs-fair-queue-demo
+```
+
+### Install Python Dependencies
 
 ```bash
 pip install boto3
 ```
 
----
+Add this to a file named `requirements.txt` if not already present:
 
-##  Setup Guide
-
-### 1. Create a Fair Queue on AWS
-
-* Go to [Amazon SQS Console](https://console.aws.amazon.com/sqs/)
-* Click **Create Queue**
-* Choose **Fair Queue**
-* Name it: `FairQueueDemo`
-* Keep defaults and click **Create Queue**
-
-### 2. Configure IAM User
-
-Ensure your IAM user has this policy attached:
-
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "sqs:SendMessage",
-        "sqs:ReceiveMessage",
-        "sqs:DeleteMessage",
-        "sqs:GetQueueUrl",
-        "sqs:GetQueueAttributes"
-      ],
-      "Resource": "*"
-    }
-  ]
-}
 ```
-
-### 3. Clone the Repo and Run Scripts
-
-```bash
-git clone https://github.com/Ismail-k13/aws-sqs-fair-queue-demo.git
-cd aws-sqs-fair-queue-demo
-pip install -r requirements.txt
+boto3
 ```
 
 ---
 
-##  How It Works
+## 6. Folder Structure
 
-### `producer.py`
+```text
+aws-sqs-fair-queue-demo/
+├── scripts/
+│   ├── producer.py      # Sends messages from tenants
+│   └── consumer.py      # Consumes and processes messages
+├── assets/
+│   └── screenshots/     # Optional visuals for queue setup and metrics
+├── .gitignore
+├── README.md
+├── LICENSE
+└── requirements.txt
+```
 
-* Sends messages from 3 tenants: `TenantA`, `TenantB`, and `TenantC`
-* Simulates noisy behavior from `TenantB`
-* SQS Fair Queue ensures fairness without throttling logic
+---
+
+## 7. Code Explanation
+
+### producer.py
+
+This script simulates sending messages from multiple tenants: `TenantA`, `TenantB`, and `TenantC`. TenantB sends more messages to simulate a noisy tenant.
+
+It uses the `MessageAttributes` field to label each message with its tenant.
+
+Command to run:
 
 ```bash
 python scripts/producer.py
 ```
 
-###  `consumer.py`
+### consumer.py
 
-* Continuously polls and processes messages
-* Fair Queue prioritizes messages from quieter tenants
+This script polls the queue continuously and prints the messages it receives. It demonstrates how Fair Queues ensure fairness by balancing message delivery from each tenant.
+
+Command to run:
 
 ```bash
 python scripts/consumer.py
@@ -115,55 +149,76 @@ python scripts/consumer.py
 
 ---
 
-##  View Monitoring
+## 8. Why Two Terminals Are Used
 
-In the AWS SQS Console:
+Using separate terminals for producer and consumer scripts allows parallel simulation:
 
-* Go to your **FairQueueDemo**
-* Click on the **Monitoring** tab
-* View metrics like:
+* One terminal runs `producer.py` to continuously send messages
+* Another runs `consumer.py` to poll and process messages
 
-  * `NumberOfMessagesSent`
-  * `NumberOfMessagesReceived`
-  * `ApproximateAgeOfOldestMessage`
+This setup helps observe real-time fairness behavior, especially when one tenant is sending more messages.
 
 ---
 
-##  Why Use Fair Queues?
+## 9. Running the Demo
 
-* 📦 No need for tenant-level rate limiting in app code
-* ⚖️ Automatic fairness and priority
-* 🚫 Prevent noisy tenants from starving others
-* 🔒 Works within AWS Free Tier
+1. Open Terminal 1:
 
----
+```bash
+python scripts/producer.py
+```
 
-##  Tested With
+2. Open Terminal 2:
 
-* ✅ Region: `Your Region` ( AWS Free Tier eligible)
-* ✅ SQS Fair Queue
-* ✅ Python 3.11
-* ✅ Boto3 1.34+
+```bash
+python scripts/consumer.py
+```
 
----
+Expected Output:
 
-##  Acknowledgements
-
-* AWS Official Blog on Fair Queues
-* AWS Boto3 SDK
-* AWS Free Tier
+* Messages from all tenants get processed in a balanced way
+* `TenantB` (noisy sender) does not dominate delivery order
 
 ---
 
-## 📸 Screenshots
+## 10. Observing Results in AWS Console
 
-*Screenshots for queue creation, CloudWatch metrics, and sample outputs go here*
+### In the SQS Dashboard
 
-> Add them under `/assets/screenshots/` and link them here.
+1. Navigate to your `FairQueueDemo`
+2. Go to the **Monitoring** tab
+3. Observe metrics:
+
+   * `NumberOfMessagesSent`
+   * `NumberOfMessagesReceived`
+   * `ApproximateAgeOfOldestMessage`
+
+These help validate that the queue is processing messages fairly and not getting backlogged.
 
 ---
 
-## ⭐️ Star the Repo
+## 11. Cleanup Steps and Security Best Practices
 
-If this helped you understand SQS Fair Queues, please ⭐️ the repo:
-👉 [https://github.com/Ismail-k13/aws-sqs-fair-queue-demo](https://github.com/Ismail-k13/aws-sqs-fair-queue-demo)
+### Delete SQS Queue
+
+To avoid unnecessary charges:
+
+1. Go to the SQS Console
+2. Select `FairQueueDemo`
+3. Choose "Delete"
+
+### Delete IAM User
+
+If created solely for this demo:
+
+1. Go to the IAM Console
+2. Find the user
+3. Click "Delete User"
+
+Removing access keys and queues ensures there are no lingering resources that could be misused or cause cost.
+
+---
+
+## 12. Conclusion
+
+This demo project demonstrates how Amazon SQS Fair Queues can be used to create a fair and balanced message delivery system without modifying application-level logic. It is ideal for multi-tenant applications where one tenant may send more messages than others. Using AWS Free Tier, IAM, Boto3, and simple Python scripts, developers can simulate and observe the benefits of this new queue type in real time.
