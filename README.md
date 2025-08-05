@@ -37,7 +37,7 @@ aws-sqs-fair-queue-demo/
 
 ---
 
-## 🛠️ Prerequisites
+##  Prerequisites
 
 * ✅ AWS Free Tier account
 * ✅ IAM user with SQS permissions
@@ -140,7 +140,7 @@ In the AWS SQS Console:
 
 ---
 
-## 🧪 Tested With
+##  Tested With
 
 * ✅ Region: `Your Region` ( AWS Free Tier eligible)
 * ✅ SQS Fair Queue
@@ -149,7 +149,7 @@ In the AWS SQS Console:
 
 ---
 
-## 🙌 Acknowledgements
+##  Acknowledgements
 
 * [AWS Official Blog on Fair Queues](https://aws.amazon.com/blogs/aws/amazon-sqs-fair-queues-now-available/)
 * AWS Boto3 SDK
@@ -169,5 +169,3 @@ In the AWS SQS Console:
 
 If this helped you understand SQS Fair Queues, please ⭐️ the repo:
 👉 [https://github.com/Ismail-k13/aws-sqs-fair-queue-demo](https://github.com/Ismail-k13/aws-sqs-fair-queue-demo)
-
-```
